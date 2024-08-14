@@ -1,10 +1,27 @@
-import React from 'react';
-import Game from './components/Game';
+import React, { useState } from 'react';
+import LandingPage from './components/LandingPage'; 
+import Game from './components/Game'; 
 
 function App() {
+  const [isGameStarted, setIsGameStarted] = useState(false);
+  const [gameMode, setGameMode] = useState(null);
+  const [player1, setPlayer1] = useState('');
+  const [player2, setPlayer2] = useState('');
+
+  const startGame = ({ gameMode, player1, player2 }) => {
+    setGameMode(gameMode);
+    setPlayer1(player1);
+    setPlayer2(player2);
+    setIsGameStarted(true);
+  };
+
   return (
     <div className="App">
-      <Game />
+      {!isGameStarted ? (
+        <LandingPage onStartGame={startGame} />
+      ) : (
+        <Game mode={gameMode} player1={player1} player2={player2} />
+      )}
     </div>
   );
 }
