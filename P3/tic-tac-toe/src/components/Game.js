@@ -12,11 +12,13 @@ const Game = () => {
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [gameStarted, setGameStarted] = useState(false);
   const [gameMode, setGameMode] = useState('');
+  const [difficulty, setDifficulty] = useState('easy');
   const [player1, setPlayer1] = useState('');
   const [player2, setPlayer2] = useState('');
 
-  const startGame = ({ gameMode, player1, player2 }) => {
+  const startGame = ({ gameMode, difficulty, player1, player2 }) => {
     setGameMode(gameMode);
+    setDifficulty(difficulty);
     setPlayer1(player1);
     setPlayer2(player2);
     setGameStarted(true);
@@ -24,12 +26,12 @@ const Game = () => {
 
   useEffect(() => {
     if (gameMode === 'ai' && !xIsNext && !winner && !isDraw) {
-      const aiMove = makeAIMove(squares);
+      const aiMove = difficulty === 'easy' ? makeAIMoveEasy(squares) : makeAIMoveHard(squares);
       if (aiMove !== null) {
         handleClick(aiMove);
       }
     }
-  }, [xIsNext, squares, gameMode, winner, isDraw]);
+  }, [xIsNext, squares, gameMode, winner, isDraw, difficulty]);
 
   const handleClick = (i) => {
     if (winner || squares[i] || isDraw) return;
@@ -57,13 +59,32 @@ const Game = () => {
     setModalIsOpen(false);
   };
 
-  const makeAIMove = (squares) => {
+  const makeAIMoveEasy = (squares) => {
     const emptySquares = squares.map((square, index) => (square === null ? index : null)).filter(index => index !== null);
     if (emptySquares.length > 0) {
       const randomIndex = Math.floor(Math.random() * emptySquares.length);
       return emptySquares[randomIndex];
     }
     return null;
+  };
+
+  const makeAIMoveHard = (squares) => {
+    // Check if AI can block the player
+    for (let i = 0; i < squares.length; i++) {
+      if (squares[i] === null) {
+        const newSquares = squares.slice();
+        newSquares[i] = 'O';
+        if (calculateWinner(newSquares)) {
+          return i; // AI places 'O' to win
+        }
+        newSquares[i] = 'X';
+        if (calculateWinner(newSquares)) {
+          return i; // AI blocks 'X' from winning
+        }
+      }
+    }
+    // If no block or win is found, pick a random move
+    return makeAIMoveEasy(squares);
   };
 
   if (!gameStarted) {
