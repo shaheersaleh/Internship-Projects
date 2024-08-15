@@ -19,7 +19,7 @@ const LandingPage = ({ onStartGame }) => {
 
   return (
     <div className="flex flex-col items-center justify-center h-screen bg-gray-800 text-white">
-      <h1 className="text-5xl font-bold mb-8">Welcome to Tic-Tac-Toe</h1>
+      <h1 className="text-5xl font-bold mb-8">Welcome to Tic Tac Toe</h1>
       {!gameMode ? (
         <div className="space-y-4">
           <button
