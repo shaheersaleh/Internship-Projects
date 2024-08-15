@@ -18,10 +18,11 @@ const LandingPage = ({ onStartGame }) => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen bg-gray-800 text-white">
-      <h1 className="text-5xl font-bold mb-8">Welcome to Tic Tac Toe</h1>
+    <div className="flex flex-col items-center justify-center h-screen bg-gray-800 text-white space-y-8">
+      <h1 className="text-5xl font-bold mb-8">Welcome to Tic-Tac-Toe</h1>
+      <p className="text-xl mb-8">Select a game mode to start playing:</p>
       {!gameMode ? (
-        <div className="space-y-4">
+        <div className="space-x-3"> {/* Increased spacing between buttons */}
           <button
             onClick={() => handleGameModeSelection('twoPlayer')}
             className="px-6 py-3 bg-blue-600 hover:bg-blue-700 rounded-lg transition"
@@ -42,7 +43,10 @@ const LandingPage = ({ onStartGame }) => {
           </button>
         </div>
       ) : (
-        <div className="mt-8">
+        <div className="mt-8 space-x-3">
+          <p className="text-lg mb-4">
+            Enter your player name{gameMode === 'twoPlayer' ? 's' : ''}:
+          </p>
           <input
             className="border p-2 rounded text-black mb-4"
             type="text"

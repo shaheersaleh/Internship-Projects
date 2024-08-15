@@ -2,36 +2,22 @@ import React, { useState, useEffect } from 'react';
 import Board from './Board';
 import Confetti from 'react-confetti';
 import Modal from 'react-modal';
-import GameSetup from './GameSetup';
 
-const Game = () => {
+const Game = ({ mode, player1, player2 }) => {
   const [squares, setSquares] = useState(Array(9).fill(null));
   const [xIsNext, setXIsNext] = useState(true);
   const [winner, setWinner] = useState(null);
   const [isDraw, setIsDraw] = useState(false);
   const [modalIsOpen, setModalIsOpen] = useState(false);
-  const [gameStarted, setGameStarted] = useState(false);
-  const [gameMode, setGameMode] = useState('');
-  const [difficulty, setDifficulty] = useState('easy');
-  const [player1, setPlayer1] = useState('');
-  const [player2, setPlayer2] = useState('');
-
-  const startGame = ({ gameMode, difficulty, player1, player2 }) => {
-    setGameMode(gameMode);
-    setDifficulty(difficulty);
-    setPlayer1(player1);
-    setPlayer2(player2);
-    setGameStarted(true);
-  };
 
   useEffect(() => {
-    if (gameMode === 'ai' && !xIsNext && !winner && !isDraw) {
-      const aiMove = difficulty === 'easy' ? makeAIMoveEasy(squares) : makeAIMoveHard(squares);
+    if ((mode === 'ai-easy' || mode === 'ai-hard') && !xIsNext && !winner && !isDraw) {
+      const aiMove = mode === 'ai-easy' ? makeAIMoveEasy(squares) : makeAIMoveHard(squares);
       if (aiMove !== null) {
         handleClick(aiMove);
       }
     }
-  }, [xIsNext, squares, gameMode, winner, isDraw, difficulty]);
+  }, [xIsNext, squares, mode, winner, isDraw]);
 
   const handleClick = (i) => {
     if (winner || squares[i] || isDraw) return;
@@ -69,27 +55,28 @@ const Game = () => {
   };
 
   const makeAIMoveHard = (squares) => {
-    // Check if AI can block the player
-    for (let i = 0; i < squares.length; i++) {
-      if (squares[i] === null) {
-        const newSquares = squares.slice();
-        newSquares[i] = 'O';
-        if (calculateWinner(newSquares)) {
-          return i; // AI places 'O' to win
-        }
-        newSquares[i] = 'X';
-        if (calculateWinner(newSquares)) {
-          return i; // AI blocks 'X' from winning
-        }
+    const lines = [
+      [0, 1, 2],
+      [3, 4, 5],
+      [6, 7, 8],
+      [0, 3, 6],
+      [1, 4, 7],
+      [2, 5, 8],
+      [0, 4, 8],
+      [2, 4, 6],
+    ];
+    for (let i = 0; i < lines.length; i++) {
+      const [a, b, c] = lines[i];
+      if (squares[a] && squares[a] === squares[b] && !squares[c]) {
+        return c;
+      } else if (squares[a] && squares[a] === squares[c] && !squares[b]) {
+        return b;
+      } else if (squares[b] && squares[b] === squares[c] && !squares[a]) {
+        return a;
       }
     }
-    // If no block or win is found, pick a random move
-    return makeAIMoveEasy(squares);
+    return makeAIMoveEasy(squares); 
   };
-
-  if (!gameStarted) {
-    return <GameSetup onStartGame={startGame} />;
-  }
 
   return (
     <div className="text-center">
