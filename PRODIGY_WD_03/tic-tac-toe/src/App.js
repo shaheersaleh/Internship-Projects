@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import LandingPage from './components/LandingPage'; 
 import Game from './components/Game'; 
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 
 function App() {
   const [isGameStarted, setIsGameStarted] = useState(false);
@@ -16,13 +17,21 @@ function App() {
   };
 
   return (
-    <div className="App">
-      {!isGameStarted ? (
-        <LandingPage onStartGame={startGame} />
-      ) : (
-        <Game mode={gameMode} player1={player1} player2={player2} />
-      )}
-    </div>
+    <Router basename="/PRODIGY_WD/PRODIGY_WD_03/tic-tac-toe">
+      <Routes>
+        {}
+        <Route
+          path="/"
+          element={
+            !isGameStarted ? (
+              <LandingPage onStartGame={startGame} />
+            ) : (
+              <Game mode={gameMode} player1={player1} player2={player2} />
+            )
+          }
+        />
+      </Routes>
+    </Router>
   );
 }
 
