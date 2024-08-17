@@ -19,12 +19,12 @@ function App() {
 
   return (
     <Router>
-    <Routes>
-      <Route path="/" element={<LandingPage onStartGame={startGame} />} />
-      <Route path="/game" element={<Game mode={gameMode} player1={player1} player2={player2} />} />
-    </Routes>
-  </Router>
-  );
+  <Routes>
+    <Route path="/" element={<LandingPage onStartGame={startGame} />} />
+    <Route path="/game" element={<Game mode={gameMode} player1={player1} player2={player2} />} />
+  </Routes>
+</Router>
+);
 }
 
 export default App;
