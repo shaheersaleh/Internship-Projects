@@ -18,13 +18,12 @@ function App() {
   };
 
   return (
-    <div className="App">
-      {!isGameStarted ? (
-        <LandingPage onStartGame={startGame} />
-      ) : (
-        <Game mode={gameMode} player1={player1} player2={player2} />
-      )}
-    </div>
+    <Router>
+      <Routes>
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/game" element={<Game />} />
+      </Routes>
+    </Router>
   );
 }
 
