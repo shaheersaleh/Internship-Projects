@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { HashRouter as Router, Route, Routes } from 'react-router-dom';
 
 import React, { useState } from 'react';
 import LandingPage from './components/LandingPage'; 
@@ -19,11 +19,11 @@ function App() {
 
   return (
     <Router>
-      <Routes>
-        <Route path="/" element={<LandingPage />} />
-        <Route path="/game" element={<Game />} />
-      </Routes>
-    </Router>
+    <Routes>
+      <Route path="/" element={<LandingPage onStartGame={startGame} />} />
+      <Route path="/game" element={<Game mode={gameMode} player1={player1} player2={player2} />} />
+    </Routes>
+  </Router>
   );
 }
 

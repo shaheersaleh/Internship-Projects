@@ -22,7 +22,7 @@ const LandingPage = ({ onStartGame }) => {
       <h1 className="text-5xl font-bold mb-8">Welcome to Tic-Tac-Toe</h1>
       <p className="text-xl mb-8">Select a game mode to start playing:</p>
       {!gameMode ? (
-        <div className="space-x-3"> {/* Increased spacing between buttons */}
+        <div className="space-x-3"> {}
           <button
             onClick={() => handleGameModeSelection('twoPlayer')}
             className="px-6 py-3 bg-blue-600 hover:bg-blue-700 rounded-lg transition"
