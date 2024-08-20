@@ -1,0 +1,9 @@
+body.sunny {
+    background: url('https://example.com/sunny-bg.jpg') no-repeat center center fixed;
+    background-size: cover;
+}
+
+body.rainy {
+    background: url('https://example.com/rainy-bg.gif') no-repeat center center fixed;
+    background-size: cover;
+}
