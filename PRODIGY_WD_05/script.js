@@ -1,51 +1,28 @@
-const apiKey = 'your_openweathermap_api_key';
+const apiKey = '3696c726e1b29975cd9317fb27b0d0b4';
+const input = document.getElementById('location-input');
+const suggestionsList = document.getElementById('suggestions');
 
-function initializeAutocomplete() {
-    const input = document.getElementById('location-input');
-    const autocomplete = new google.maps.places.Autocomplete(input, {
-        types: ['(cities)'], 
-    });
-    autocomplete.addListener('place_changed', () => {
-        const place = autocomplete.getPlace();
-        console.log('Selected city:', place.name); 
-    });
-}
-document.getElementById('fetch-weather').addEventListener('click', () => {
-    const location = document.getElementById('location-input').value;
-    fetchWeatherData(location);
-});
-function fetchWeatherData(city) {
-    fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${apiKey}`)
-        .then(response => response.json())
-        .then(data => displayWeather(data))
-        .catch(error => alert('Location not found!'));
-}
+input.addEventListener('input', function() {
+    const query = input.value;
+    if (query.length > 2) {
+        fetch(`https://api.openweathermap.org/geo/1.0/direct?q=${query}&limit=5&appid=${apiKey}`)
+            .then(response => response.json())
+            .then(data => {
+                suggestionsList.innerHTML = '';
 
-function displayWeather(data) {
-    if (data.cod !== 200) {
-        alert('Location not found!');
-        return;
-    }
-
-    const locationName = data.name;
-    const temperature = data.main.temp;
-    const conditions = data.weather[0].description;
-    const weatherMain = data.weather[0].main.toLowerCase();
-
-    document.getElementById('location-name').innerText = locationName;
-    document.getElementById('temperature').innerText = `${temperature}°C`;
-    document.getElementById('conditions').innerText = conditions;
-
-    document.getElementById('weather-info').classList.remove('hidden');
-
-    if (weatherMain.includes('rain')) {
-        document.body.classList.add('rainy');
-        document.body.classList.remove('sunny');
-    } else if (weatherMain.includes('clear')) {
-        document.body.classList.add('sunny');
-        document.body.classList.remove('rainy');
+            
+                data.forEach(city => {
+                    const listItem = document.createElement('li');
+                    listItem.textContent = `${city.name}, ${city.country}`;
+                    listItem.classList.add('cursor-pointer', 'p-2', 'hover:bg-gray-200');
+                    listItem.addEventListener('click', () => {
+                        input.value = `${city.name}, ${city.country}`;
+                        suggestionsList.innerHTML = '';
+                    });
+                    suggestionsList.appendChild(listItem);
+                });
+            });
     } else {
-        document.body.classList.remove('sunny', 'rainy');
+        suggestionsList.innerHTML = '';
     }
-}
-google.maps.event.addDomListener(window, 'load', initializeAutocomplete);
+});
