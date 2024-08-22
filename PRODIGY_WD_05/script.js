@@ -1,58 +1,132 @@
-const apiKey = 'your_openweathermap_api_key';
-const input = document.getElementById('location-input');
-const suggestionsList = document.getElementById('suggestions');
-const weatherButton = document.getElementById('fetch-weather');
+const apiKey = '3696c726e1b29975cd9317fb27b0d0b4';
 const weatherInfo = document.getElementById('weather-info');
-const locationName = document.getElementById('location-name');
-const temperature = document.getElementById('temperature');
-const conditions = document.getElementById('conditions');
+const errorMessage = document.getElementById('error-message');
+const cityNameElement = document.getElementById('city-name');
+const timeElement = document.getElementById('time');
+const temperatureElement = document.getElementById('temperature');
+const conditionsElement = document.getElementById('conditions');
+const additionalInfoElement = document.getElementById('additional-info');
+const fetchWeatherButton = document.getElementById('fetch-weather');
+const locationInput = document.getElementById('location-input');
+const suggestionsDiv = document.getElementById('suggestions');
 
-let selectedCity = null; 
-input.addEventListener('input', function () {
-    const query = input.value;
-    if (query.length > 2) { 
-        fetch(`https://api.openweathermap.org/geo/1.0/direct?q=${query}&limit=5&appid=${apiKey}`)
-            .then(response => response.json())
-            .then(data => {
-                suggestionsList.innerHTML = '';
+const cities = ["New York", "Los Angeles", "Chicago", "Houston", "Phoenix", "Philadelphia", "San Antonio", "San Diego", "Dallas", "San Jose", "Austin", "Jacksonville"];
 
-                data.forEach(city => {
-                    const listItem = document.createElement('li');
-                    listItem.textContent = `${city.name}, ${city.state ? city.state + ', ' : ''}${city.country}`;
-                    listItem.classList.add('cursor-pointer', 'p-2', 'hover:bg-gray-200');
-                    listItem.addEventListener('click', () => {
-                        input.value = `${city.name}, ${city.state ? city.state + ', ' : ''}${city.country}`;
-                        selectedCity = city; // Store the selected city
-                        suggestionsList.innerHTML = '';
-                    });
-                    suggestionsList.appendChild(listItem);
+locationInput.addEventListener('input', () => {
+    const input = locationInput.value.toLowerCase();
+    suggestionsDiv.innerHTML = ''; 
+    if (input) {
+        const filteredCities = cities.filter(city => city.toLowerCase().startsWith(input));
+        if (filteredCities.length > 0) {
+            suggestionsDiv.style.display = 'block';
+            filteredCities.forEach(city => {
+                const suggestion = document.createElement('div');
+                suggestion.textContent = city;
+                suggestion.addEventListener('click', () => {
+                    locationInput.value = city;
+                    suggestionsDiv.style.display = 'none';
                 });
+                suggestionsDiv.appendChild(suggestion);
             });
+        } else {
+            suggestionsDiv.style.display = 'none';
+        }
     } else {
-        suggestionsList.innerHTML = '';
+        suggestionsDiv.style.display = 'none';
     }
 });
 
-weatherButton.addEventListener('click', function () {
-    if (selectedCity) {
-        fetchWeather(selectedCity.lat, selectedCity.lon);
-    } else {
-        alert('Please select a city from the suggestions.');
+document.addEventListener('click', (event) => {
+    if (!suggestionsDiv.contains(event.target) && event.target !== locationInput) {
+        suggestionsDiv.style.display = 'none';
     }
 });
 
-function fetchWeather(lat, lon) {
-    fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=metric&appid=${apiKey}`)
-        .then(response => response.json())
-        .then(data => {
-            locationName.textContent = `${data.name}, ${data.sys.country}`;
-            temperature.textContent = `${Math.round(data.main.temp)}°C`;
-            conditions.textContent = data.weather[0].description;
+fetchWeatherButton.addEventListener('click', () => {
+    const location = locationInput.value.trim();
+    if (location) {
+        getWeatherByCity(location);
+    } else {
+        getWeatherByGeolocation();
+    }
+});
 
-            weatherInfo.classList.remove('hidden');
-        })
-        .catch(error => {
-            console.error('Error fetching weather data:', error);
-            alert('Failed to fetch weather data.');
+async function getWeatherByCity(city) {
+    try {
+        const response = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`);
+        if (!response.ok) throw new Error('City not found');
+        const data = await response.json();
+        displayWeather(data);
+    } catch (error) {
+        showError(error.message);
+    }
+}
+
+function getWeatherByGeolocation() {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(async (position) => {
+            const { latitude, longitude } = position.coords;
+            try {
+                const response = await fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${apiKey}&units=metric`);
+                const data = await response.json();
+                displayWeather(data);
+            } catch (error) {
+                showError('Unable to fetch weather data');
+            }
+        }, () => {
+            showError('Geolocation access denied');
         });
+    } else {
+        showError('Geolocation is not supported by your browser');
+    }
+}
+
+function displayWeather(data) {
+    weatherInfo.classList.remove('hidden');
+    errorMessage.classList.add('hidden');
+
+    // Get the Unix timestamp and timezone offset in seconds
+    const utcSeconds = data.dt;
+    const timezoneOffset = data.timezone;
+
+    // Calculate local time by adding the timezone offset to the UTC timestamp
+    const localTimeInMs = (utcSeconds + timezoneOffset) * 1000; // Convert to milliseconds
+
+    // Create a Date object using the adjusted local time
+    const localDate = new Date(localTimeInMs);
+
+    // Format the time correctly
+    const localTime = localDate.toLocaleTimeString('en-US', {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true,
+    });
+
+    // Update the UI with the weather information
+    cityNameElement.textContent = `${data.name}, ${data.sys.country}`;
+    timeElement.textContent = `Local Time: ${localTime}`;
+    temperatureElement.textContent = `Temperature: ${data.main.temp}°C`;
+    conditionsElement.textContent = `Conditions: ${data.weather[0].description}`;
+    additionalInfoElement.textContent = `Humidity: ${data.main.humidity}% | Wind Speed: ${data.wind.speed} m/s`;
+
+    updateBackground(data.weather[0].main);
+}
+
+function showError(message) {
+    errorMessage.textContent = message;
+    errorMessage.classList.remove('hidden');
+    weatherInfo.classList.add('hidden');
+}
+
+function updateBackground(condition) {
+    const body = document.body;
+    if (condition.toLowerCase().includes('rain')) {
+        body.className = 'flex items-center justify-center min-h-screen bg-gray-700 text-white';
+    } else if (condition.toLowerCase().includes('clear')) {
+        body.className = 'flex items-center justify-center min-h-screen bg-blue-500 text-white';
+    } else if (condition.toLowerCase().includes('cloud')) {
+        body.className = 'flex items-center justify-center min-h-screen bg-gray-500 text-white';
+    } else {
+        body.className = 'flex items-center justify-center min-h-screen bg-blue-500 text-white';
+    }
 }
