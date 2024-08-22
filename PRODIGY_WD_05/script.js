@@ -1,10 +1,21 @@
 const apiKey = 'your_openweathermap_api_key';
 
-document.getElementById('fetch-weather').addEventListener('click', getWeather);
-
-function getWeather() {
-    const location = document.getElementById('location-input').value || 'auto:ip';
-    fetch(`https://api.openweathermap.org/data/2.5/weather?q=${location}&units=metric&appid=${apiKey}`)
+function initializeAutocomplete() {
+    const input = document.getElementById('location-input');
+    const autocomplete = new google.maps.places.Autocomplete(input, {
+        types: ['(cities)'], 
+    });
+    autocomplete.addListener('place_changed', () => {
+        const place = autocomplete.getPlace();
+        console.log('Selected city:', place.name); 
+    });
+}
+document.getElementById('fetch-weather').addEventListener('click', () => {
+    const location = document.getElementById('location-input').value;
+    fetchWeatherData(location);
+});
+function fetchWeatherData(city) {
+    fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${apiKey}`)
         .then(response => response.json())
         .then(data => displayWeather(data))
         .catch(error => alert('Location not found!'));
@@ -25,10 +36,8 @@ function displayWeather(data) {
     document.getElementById('temperature').innerText = `${temperature}°C`;
     document.getElementById('conditions').innerText = conditions;
 
-    
     document.getElementById('weather-info').classList.remove('hidden');
 
-    
     if (weatherMain.includes('rain')) {
         document.body.classList.add('rainy');
         document.body.classList.remove('sunny');
@@ -39,3 +48,4 @@ function displayWeather(data) {
         document.body.classList.remove('sunny', 'rainy');
     }
 }
+google.maps.event.addDomListener(window, 'load', initializeAutocomplete);
