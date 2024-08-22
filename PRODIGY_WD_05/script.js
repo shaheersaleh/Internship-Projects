@@ -80,22 +80,17 @@ function getWeatherByGeolocation() {
         showError('Geolocation is not supported by your browser');
     }
 }
-
 function displayWeather(data) {
     weatherInfo.classList.remove('hidden');
     errorMessage.classList.add('hidden');
 
-    // Get the Unix timestamp and timezone offset in seconds
+    // Get the UTC time in seconds
     const utcSeconds = data.dt;
-    const timezoneOffset = data.timezone;
 
-    // Calculate local time by adding the timezone offset to the UTC timestamp
-    const localTimeInMs = (utcSeconds + timezoneOffset) * 1000; // Convert to milliseconds
+    // Calculate the local time using the UTC timestamp (directly handled by Date)
+    const localDate = new Date(utcSeconds * 1000); // Convert to milliseconds
 
-    // Create a Date object using the adjusted local time
-    const localDate = new Date(localTimeInMs);
-
-    // Format the time correctly
+    // Format the local time correctly
     const localTime = localDate.toLocaleTimeString('en-US', {
         hour: '2-digit',
         minute: '2-digit',
