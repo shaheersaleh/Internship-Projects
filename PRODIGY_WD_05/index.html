@@ -16,7 +16,8 @@
 
         <input type="text" id="location-input" placeholder="Enter city" class="w-full p-2 mb-4 border rounded">
 
-        <ul id="suggestions" class="mt-2"></ul>
+        <ul id="suggestions" class="mt-2 bg-white border rounded shadow-lg max-h-40 overflow-y-auto"></ul>
+
         <button id="fetch-weather" class="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600 mt-4">Get Weather</button>
         <div id="weather-info" class="mt-6 hidden">
             <h2 id="location-name" class="text-xl font-semibold"></h2>
@@ -24,6 +25,7 @@
             <p id="conditions" class="text-lg"></p>
         </div>
     </div>
+
     <script src="script.js"></script>
 </body>
 
