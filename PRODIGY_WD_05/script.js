@@ -84,20 +84,15 @@ function displayWeather(data) {
     weatherInfo.classList.remove('hidden');
     errorMessage.classList.add('hidden');
 
-    // Get the UTC time in seconds
     const utcSeconds = data.dt;
+    const localDate = new Date(utcSeconds * 1000);
 
-    // Calculate the local time using the UTC timestamp (directly handled by Date)
-    const localDate = new Date(utcSeconds * 1000); // Convert to milliseconds
-
-    // Format the local time correctly
     const localTime = localDate.toLocaleTimeString('en-US', {
         hour: '2-digit',
         minute: '2-digit',
         hour12: true,
     });
 
-    // Update the UI with the weather information
     cityNameElement.textContent = `${data.name}, ${data.sys.country}`;
     timeElement.textContent = `Local Time: ${localTime}`;
     temperatureElement.textContent = `Temperature: ${data.main.temp}°C`;
@@ -116,12 +111,16 @@ function showError(message) {
 function updateBackground(condition) {
     const body = document.body;
     if (condition.toLowerCase().includes('rain')) {
-        body.className = 'flex items-center justify-center min-h-screen bg-gray-700 text-white';
+        body.className = 'flex items-center justify-center min-h-screen bg-gray-800 text-white';
     } else if (condition.toLowerCase().includes('clear')) {
-        body.className = 'flex items-center justify-center min-h-screen bg-blue-500 text-white';
+        body.className = 'flex items-center justify-center min-h-screen bg-gray-100 text-white';
     } else if (condition.toLowerCase().includes('cloud')) {
-        body.className = 'flex items-center justify-center min-h-screen bg-gray-500 text-white';
-    } else {
-        body.className = 'flex items-center justify-center min-h-screen bg-blue-500 text-white';
+        body.className = 'flex items-center justify-center min-h-screen bg-gray-200 text-white';
+    } 
+    else if (condition.toLowerCase().includes('smoke')) {
+        body.className = 'flex items-center justify-center min-h-screen bg-gray-400 text-white';
+    }
+    else {
+        body.className = 'flex items-center justify-center min-h-screen bg-white-300 text-white';
     }
 }

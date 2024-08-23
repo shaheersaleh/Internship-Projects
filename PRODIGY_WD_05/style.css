@@ -4,6 +4,6 @@ body.sunny {
 }
 
 body.rainy {
-    background: url('https://example.com/rainy-bg.gif') no-repeat center center fixed;
+    background: url('<iframe src="https://giphy.com/embed/xT9DPAG03SyJ3LEwwM" width="480" height="480" style="" frameBorder="0" class="giphy-embed" allowFullScreen></iframe><p><a href="https://giphy.com/gifs/rain-mouse-marko-xT9DPAG03SyJ3LEwwM">via GIPHY</a></p>') no-repeat center center fixed;
     background-size: cover;
 }
